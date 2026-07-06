@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Task Management System
 
 ## Overview
@@ -49,3 +50,6 @@ npm run dev
 ## Author
 
 Shruchi
+=======
+# Task-Management-System
+>>>>>>> 7d2506e9608e8942f869f245de6525bd5269f897
