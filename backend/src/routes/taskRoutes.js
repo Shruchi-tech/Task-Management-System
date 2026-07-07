@@ -17,6 +17,12 @@ const {
 
 // Create Task
 router.post("/", authMiddleware, validateTask,createTask);
+//get task stats
+router.get("/stats",authMiddleware,getTaskStats);
+//get today task
+router.get("/today",authMiddleware,getTodayTasks);
+//get overdue task
+router.get("/overdue",authMiddleware,getOverdueTasks);
 
 // Get All Tasks
 router.get("/", authMiddleware, getTasks);
@@ -26,12 +32,6 @@ router.put("/:id", authMiddleware, updateTask);
 
 // Delete Task
 router.delete("/:id", authMiddleware, deleteTask);
-//get task stats
-router.get("/stats",authMiddleware,getTaskStats);
-//get today task
-router.get("/today",authMiddleware,getTodayTasks);
-//get overdue task
-router.get("/overdue",authMiddleware,getOverdueTasks);
 //mark task completed
 router.put("/:id/complete",authMiddleware,markComplete);
 

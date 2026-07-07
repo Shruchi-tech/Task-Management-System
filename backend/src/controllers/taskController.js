@@ -2,13 +2,14 @@ const db = require("../db/db");
 
 // Create Task
 const createTask = (req, res) => {
+        const { title, description, duedate, priority, status } = req.body;
+
     if (!title || !duedate || !priority || !status) {
     return res.status(400).json({
         message: "All required fields are mandatory"
     });
    }
 
-    const { title, description, duedate, priority, status } = req.body;
 
     const userid = req.user.id;
 
@@ -26,12 +27,14 @@ const createTask = (req, res) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({
-                    message: "Server Error"
+                    message: "Server Error",
                 });
             }
 
             res.status(201).json({
-                message: "Task Created Successfully"
+                message: "Task Created Successfully",
+                taskId: result.insertId
+
             });
 
         }
@@ -69,14 +72,17 @@ const getTasks = (req, res) => {
         sql += " AND priority=?";
         values.push(priority);
     }
+    const sortOrder = sort.toUpperCase() === "DESC" ? "DESC" : "ASC";
+    sql += ` ORDER BY duedate ${sortOrder}`;
+    
+    const pageNum = Number(page);
+    const limitNum = Number(limit);
 
-    sql += ` ORDER BY duedate ${sort}`;
-
-    const offset = (page - 1) * limit;
+    const offset = (pageNum - 1) * limitNum;
 
     sql += " LIMIT ? OFFSET ?";
 
-    values.push(Number(limit));
+    values.push(Number(limitNum));
     values.push(Number(offset));
 
     db.query(sql, values, (err, result) => {
@@ -100,7 +106,11 @@ const updateTask = (req, res) => {
     const { id } = req.params;
 
     const { title, description, duedate, priority, status } = req.body;
-
+    if (!title || !duedate || !priority || !status) {
+    return res.status(400).json({
+        message: "All required fields are mandatory"
+    });
+}
     const userid = req.user.id;
 
     const sql = `
@@ -187,11 +197,11 @@ const getTaskStats = (req, res) => {
 
     const sql = `
     SELECT
-        COUNT(*) AS totalTasks,
-        SUM(status='completed') AS completedTasks,
-        SUM(status='pending') AS pendingTasks,
-        SUM(status='in_progress') AS inProgressTasks,
-        SUM(priority='high') AS highPriorityTasks
+    COUNT(*) AS totalTasks,
+    COALESCE(SUM(status='completed'),0) AS completedTasks,
+    COALESCE(SUM(status='pending'),0) AS pendingTasks,
+    COALESCE(SUM(status='in_progress'),0) AS inProgressTasks,
+    COALESCE(SUM(priority='high'),0) AS highPriorityTasks
     FROM task
     WHERE userid=?
     `;
@@ -281,7 +291,11 @@ const markComplete=(req,res)=>{
                 message:"Server Error"
             });
         }
-
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Task Not Found"
+            });
+        }
         res.json({
             message:"Task Completed"
         });
