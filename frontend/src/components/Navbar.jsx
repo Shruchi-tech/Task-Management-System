@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
+import "../styles/navbar.css";
 
 function Navbar() {
 
@@ -7,28 +8,38 @@ function Navbar() {
     const logout = () => {
 
         localStorage.removeItem("token");
-
-        alert("Logged Out");
-
         navigate("/");
 
     };
 
     return (
 
-        <div>
+        <nav className="custom-navbar">
 
-            <Link to="/dashboard">Dashboard</Link>
+            <div className="navbar-content">
 
-            {" | "}
+                <Link to="/dashboard" className="logo">
 
-            <button onClick={logout}>
-                Logout
-            </button>
+                    <i className="bi bi-check2-square"></i>
 
-            <hr />
+                    <span>Task Management</span>
 
-        </div>
+                </Link>
+
+                <button
+                    className="logout-btn"
+                    onClick={logout}
+                >
+
+                    <i className="bi bi-box-arrow-right"></i>
+
+                    Logout
+
+                </button>
+
+            </div>
+
+        </nav>
 
     );
 

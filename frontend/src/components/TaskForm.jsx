@@ -43,64 +43,115 @@ function TaskForm({ fetchTasks }) {
 
     };
 
-    return (
+   return (
 
-        <form onSubmit={handleSubmit}>
+<div>
 
-            <input
-                type="text"
-                placeholder="Title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-            />
+<form onSubmit={handleSubmit}>
 
-            <br /><br />
+<div className="row">
 
-            <textarea
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-            />
+<div className="col-md-6 mb-3">
 
-            <br /><br />
+<label className="form-label">Title</label>
 
-            <input
-                type="date"
-                value={duedate}
-                onChange={(e) => setDuedate(e.target.value)}
-            />
+<input
+type="text"
+className="form-control"
+placeholder="Enter Task Title"
+value={title}
+onChange={(e)=>setTitle(e.target.value)}
+required
+/>
 
-            <br /><br />
+</div>
 
-            <select
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-            >
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-            </select>
+<div className="col-md-6 mb-3">
 
-            <br /><br />
+<label className="form-label">Due Date</label>
 
-            <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-            >
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-            </select>
+<input
+type="date"
+className="form-control"
+value={duedate}
+onChange={(e)=>setDuedate(e.target.value)}
+required
+/>
 
-            <br /><br />
+</div>
 
-            <button type="submit">
-                Add Task
-            </button>
+</div>
 
-        </form>
+<div className="mb-3">
 
-    );
+<label className="form-label">Description</label>
+
+<textarea
+className="form-control"
+rows="3"
+placeholder="Task Description"
+value={description}
+onChange={(e)=>setDescription(e.target.value)}
+/>
+
+</div>
+
+<div className="row">
+
+<div className="col-md-6 mb-3">
+
+<label className="form-label">Priority</label>
+
+<select
+className="form-select"
+value={priority}
+onChange={(e)=>setPriority(e.target.value)}
+>
+
+<option value="low">Low</option>
+<option value="medium">Medium</option>
+<option value="high">High</option>
+
+</select>
+
+</div>
+
+<div className="col-md-6 mb-3">
+
+<label className="form-label">Status</label>
+
+<select
+className="form-select"
+value={status}
+onChange={(e)=>setStatus(e.target.value)}
+>
+
+<option value="pending">Pending</option>
+<option value="in_progress">In Progress</option>
+<option value="completed">Completed</option>
+
+</select>
+
+</div>
+
+</div>
+
+<button
+type="submit"
+className="btn btn-primary"
+>
+
+<i className="bi bi-plus-circle me-2"></i>
+
+Add Task
+
+</button>
+
+</form>
+
+</div>
+
+);
 
 }
 

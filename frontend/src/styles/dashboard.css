@@ -1,0 +1,49 @@
+body{
+    background:#4b5057;
+}
+
+.dashboard-title{
+    font-size:34px;
+    font-weight:700;
+}
+
+.dashboard-subtitle{
+    color:#6c757d;
+    margin-bottom:30px;
+}
+
+.stats-card{
+    border:none;
+    border-radius:15px;
+    transition:.3s;
+}
+
+.stats-card:hover{
+    transform:translateY(-5px);
+}
+
+.form-card{
+
+    border:none;
+    border-radius:15px;
+
+}
+
+.tasks-heading{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:40px 0 20px;
+
+}
+
+.footer{
+
+margin-top:70px;
+padding:20px;
+text-align:center;
+color:#777;
+border-top:1px solid #ddd;
+
+}
