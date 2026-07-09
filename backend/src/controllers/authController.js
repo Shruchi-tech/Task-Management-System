@@ -45,8 +45,10 @@ const login = (req, res) => {
         const user = result[0];
 
         console.log("User:", user);   // ✅ Ab yahan sahi hai
+       
+const match = await bcrypt.compare(password, user.password);
 
-        const match = await bcrypt.compare(password, user.password);
+        
 
         if (!match) {
     return res.status(401).json({ message: "Invalid Password" });

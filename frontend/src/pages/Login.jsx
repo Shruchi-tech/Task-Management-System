@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/api";
 
 function Login() {
 
@@ -15,13 +15,10 @@ function Login() {
 
         try {
 
-            const res = await axios.post(
-                "http://localhost:5000/api/auth/login",
-                {
-                    email,
-                    password
-                }
-            );
+            const res = await loginUser({
+                email,
+                password
+            });
 
             localStorage.setItem("token", res.data.token);
 
@@ -33,7 +30,7 @@ function Login() {
 
             console.log(err);
 
-            alert("Invalid Email or Password");
+            alert(err.response?.data?.message || "Invalid Email or Password");
 
         }
 
@@ -67,6 +64,15 @@ function Login() {
 
                 <button type="submit">
                     Login
+                </button>
+
+                <br /><br />
+
+                <button
+                    type="button"
+                    onClick={() => navigate("/register")}
+                >
+                    Register
                 </button>
 
             </form>

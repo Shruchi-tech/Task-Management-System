@@ -10,7 +10,7 @@ function Navbar() {
 
         alert("Logged Out");
 
-        navigate("/login");
+        navigate("/");
 
     };
 

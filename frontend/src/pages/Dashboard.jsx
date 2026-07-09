@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { getTasks, deleteTask } from "../services/api";
+
 import Navbar from "../components/Navbar";
 import TaskForm from "../components/TaskForm";
 import TaskCard from "../components/TaskCard";
@@ -8,80 +9,78 @@ function Dashboard() {
 
     const [tasks, setTasks] = useState([]);
 
-    const token = localStorage.getItem("token");
-
     const fetchTasks = async () => {
+
         try {
 
-            const res = await axios.get(
-                "http://localhost:5000/api/tasks",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            const res = await getTasks();
 
             setTasks(res.data);
 
         } catch (err) {
+
             console.log(err);
+
         }
+
     };
 
     useEffect(() => {
+
         fetchTasks();
+
     }, []);
 
     const handleDelete = async (id) => {
+
         try {
 
-            await axios.delete(
-                `http://localhost:5000/api/tasks/${id}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            await deleteTask(id);
 
             fetchTasks();
 
         } catch (err) {
+
             console.log(err);
+
         }
+
     };
 
     return (
+
         <div style={{ padding: "30px" }}>
 
-           <Navbar />
+            <Navbar />
 
-<h1>Task Dashboard</h1>
+            <h1>Task Dashboard</h1>
 
-<TaskForm fetchTasks={fetchTasks} />
+            <TaskForm fetchTasks={fetchTasks} />
 
-<hr />
+            <hr />
 
-{
-    tasks.length === 0 ?
+            {
+                tasks.length === 0 ?
 
-        <h3>No Tasks Found</h3>
+                    <h3>No Tasks Found</h3>
 
-        :
+                    :
 
-        tasks.map((task) => (
+                    tasks.map((task) => (
 
-            <TaskCard
-                key={task.id}
-                task={task}
-                onDelete={handleDelete}
-            />
+                        <TaskCard
+                            key={task.id}
+                            task={task}
+                            onDelete={handleDelete}
+                        />
 
-        ))
-}
+                    ))
+            }
+
         </div>
+
     );
+
 }
 
 export default Dashboard;

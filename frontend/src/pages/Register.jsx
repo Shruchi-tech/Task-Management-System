@@ -1,6 +1,6 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../services/api";
 
 function Register() {
 
@@ -16,24 +16,21 @@ function Register() {
 
         try {
 
-            await axios.post(
-                "http://localhost:5000/api/auth/register",
-                {
-                    name,
-                    email,
-                    password
-                }
-            );
+            await registerUser({
+                name,
+                email,
+                password
+            });
 
             alert("Registration Successful");
 
-            navigate("/login");
+            navigate("/");
 
         } catch (err) {
 
             console.log(err);
 
-            alert("Registration Failed");
+            alert(err.response?.data?.message || "Registration Failed");
 
         }
 
@@ -76,6 +73,15 @@ function Register() {
 
                 <button type="submit">
                     Register
+                </button>
+
+                <br /><br />
+
+                <button
+                    type="button"
+                    onClick={() => navigate("/")}
+                >
+                    Back to Login
                 </button>
 
             </form>

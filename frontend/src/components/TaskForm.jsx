@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { createTask } from "../services/api";
 
 function TaskForm({ fetchTasks }) {
 
@@ -9,29 +9,19 @@ function TaskForm({ fetchTasks }) {
     const [priority, setPriority] = useState("medium");
     const [status, setStatus] = useState("pending");
 
-    const token = localStorage.getItem("token");
-
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         try {
 
-            await axios.post(
-                "http://localhost:5000/api/tasks",
-                {
-                    title,
-                    description,
-                    duedate,
-                    priority,
-                    status,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+            await createTask({
+                title,
+                description,
+                duedate,
+                priority,
+                status,
+            });
 
             alert("Task Added");
 
@@ -46,6 +36,8 @@ function TaskForm({ fetchTasks }) {
         } catch (err) {
 
             console.log(err);
+
+            alert(err.response?.data?.message || "Failed to Add Task");
 
         }
 
