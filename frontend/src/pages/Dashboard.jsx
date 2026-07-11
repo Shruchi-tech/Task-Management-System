@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { getTasks, deleteTask, getTaskStats } from "../services/api";
+import {
+    getTasks,
+    deleteTask,
+    getTaskStats,
+    markComplete,
+     getTodayTasks,
+    getOverdueTasks
+} from "../services/api";
+
 import "../styles/dashboard.css";
 
 import Navbar from "../components/Navbar";
@@ -9,6 +17,17 @@ import TaskCard from "../components/TaskCard";
 function Dashboard() {
 
     const [tasks, setTasks] = useState([]);
+    const [search, setSearch] = useState("");
+   const [todayTasks, setTodayTasks] = useState([]);
+
+const [overdueTasks, setOverdueTasks] = useState([]);
+const [statusFilter, setStatusFilter] = useState("");
+
+const [priorityFilter, setPriorityFilter] = useState("");
+
+const [sortOrder, setSortOrder] = useState("ASC"); 
+
+    const [editingTask, setEditingTask] = useState(null);
 
     const [stats, setStats] = useState({
         totalTasks: 0,
@@ -21,9 +40,14 @@ function Dashboard() {
 
         try {
 
-            const res = await getTasks();
+            const res = await getTasks({
+         search,
+         status: statusFilter,
+         priority: priorityFilter,
+         sort: sortOrder,
+         });
 
-            setTasks(res.data);
+         setTasks(res.data);
 
         } catch (err) {
 
@@ -48,13 +72,51 @@ function Dashboard() {
         }
 
     };
+    const fetchTodayTasks = async () => {
 
+    try {
+
+        const res = await getTodayTasks();
+
+        setTodayTasks(res.data);
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+};
+
+const fetchOverdueTasks = async () => {
+
+    try {
+
+        const res = await getOverdueTasks();
+
+        setOverdueTasks(res.data);
+
+    } catch (err) {
+
+        console.log(err);
+
+    }
+
+};
     useEffect(() => {
 
-        fetchTasks();
+      fetchTasks();
+      fetchStats();
+      fetchTodayTasks();
+      fetchOverdueTasks();
+
+     }, [search, statusFilter, priorityFilter, sortOrder]);
+
+      useEffect(() => {
+
         fetchStats();
 
-    }, []);
+     }, []);
 
     const handleDelete = async (id) => {
 
@@ -64,6 +126,38 @@ function Dashboard() {
 
             fetchTasks();
             fetchStats();
+            fetchTodayTasks();
+            fetchOverdueTasks();
+
+        } catch (err) {
+
+            console.log(err);
+
+        }
+
+    };
+
+    const handleEdit = (task) => {
+
+        setEditingTask(task);
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        });
+
+    };
+
+    const handleComplete = async (id) => {
+
+        try {
+
+            await markComplete(id);
+
+            fetchTasks();
+           fetchStats();
+            fetchTodayTasks();
+           fetchOverdueTasks();
 
         } catch (err) {
 
@@ -186,15 +280,67 @@ function Dashboard() {
                     </div>
 
                 </div>
+                <div className="row mb-4">
 
-                {/* Add Task */}
+    <div className="col-md-6">
+
+        <div className="card shadow-sm border-0 h-100">
+
+            <div className="card-body text-center">
+
+                <h5 className="text-primary">
+
+                    Today's Tasks
+
+                </h5>
+
+                <h1>
+
+                    {todayTasks.length}
+
+                </h1>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div className="col-md-6">
+
+        <div className="card shadow-sm border-0 h-100">
+
+            <div className="card-body text-center">
+
+                <h5 className="text-danger">
+
+                    Overdue Tasks
+
+                </h5>
+
+                <h1>
+
+                    {overdueTasks.length}
+
+                </h1>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+                {/* Task Form */}
 
                 <div className="card shadow-sm form-card mb-5">
 
                     <div className="card-header bg-white">
 
                         <h4 className="mb-0">
-                            Add New Task
+
+                            {editingTask ? "Edit Task" : "Add New Task"}
+
                         </h4>
 
                     </div>
@@ -202,6 +348,8 @@ function Dashboard() {
                     <div className="card-body">
 
                         <TaskForm
+                            editingTask={editingTask}
+                            setEditingTask={setEditingTask}
                             fetchTasks={() => {
                                 fetchTasks();
                                 fetchStats();
@@ -211,7 +359,74 @@ function Dashboard() {
                     </div>
 
                 </div>
+                 {/* Search / Filter / Sort */}
 
+<div className="card shadow-sm border-0 mb-4">
+
+    <div className="card-body">
+
+        <div className="row g-3">
+
+            <div className="col-lg-4">
+
+                <input
+                    type="text"
+                    className="form-control"
+                    placeholder="🔍 Search by title..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+
+            </div>
+
+            <div className="col-lg-3">
+
+                <select
+                    className="form-select"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                    <option value="">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+
+            </div>
+
+            <div className="col-lg-3">
+
+                <select
+                    className="form-select"
+                    value={priorityFilter}
+                    onChange={(e) => setPriorityFilter(e.target.value)}
+                >
+                    <option value="">All Priority</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+
+            </div>
+
+            <div className="col-lg-2">
+
+                <select
+                    className="form-select"
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value)}
+                >
+                    <option value="ASC">Due Date ↑</option>
+                    <option value="DESC">Due Date ↓</option>
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
                 {/* Task List */}
 
                 <div className="tasks-heading">
@@ -242,6 +457,8 @@ function Dashboard() {
                                 key={task.id}
                                 task={task}
                                 onDelete={handleDelete}
+                                onEdit={handleEdit}
+                                onComplete={handleComplete}
                             />
 
                         ))

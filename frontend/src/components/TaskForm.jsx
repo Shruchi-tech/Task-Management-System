@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { createTask } from "../services/api";
+import { useState, useEffect } from "react";
+import { createTask, updateTask } from "../services/api";
 
-function TaskForm({ fetchTasks }) {
+function TaskForm({ fetchTasks, editingTask, setEditingTask }) {
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -9,27 +9,64 @@ function TaskForm({ fetchTasks }) {
     const [priority, setPriority] = useState("medium");
     const [status, setStatus] = useState("pending");
 
+    useEffect(() => {
+
+        if (editingTask) {
+
+            setTitle(editingTask.title);
+            setDescription(editingTask.description || "");
+            setDuedate(editingTask.duedate?.split("T")[0] || editingTask.duedate);
+            setPriority(editingTask.priority);
+            setStatus(editingTask.status);
+
+        } else {
+    
+            resetForm();
+
+       }
+
+    }, [editingTask]);
+
+    const resetForm = () => {
+
+        setTitle("");
+        setDescription("");
+        setDuedate("");
+        setPriority("medium");
+        setStatus("pending");
+        setEditingTask(null);
+
+    };
+
     const handleSubmit = async (e) => {
 
         e.preventDefault();
 
         try {
 
-            await createTask({
+            const taskData = {
                 title,
                 description,
                 duedate,
                 priority,
                 status,
-            });
+            };
 
-            alert("Task Added");
+            if (editingTask) {
 
-            setTitle("");
-            setDescription("");
-            setDuedate("");
-            setPriority("medium");
-            setStatus("pending");
+                await updateTask(editingTask.id, taskData);
+
+                alert("Task Updated Successfully");
+
+            } else {
+
+                await createTask(taskData);
+
+                alert("Task Added Successfully");
+
+            }
+
+            resetForm();
 
             fetchTasks();
 
@@ -37,121 +74,145 @@ function TaskForm({ fetchTasks }) {
 
             console.log(err);
 
-            alert(err.response?.data?.message || "Failed to Add Task");
+            alert(err.response?.data?.message || "Something went wrong");
 
         }
 
     };
 
-   return (
+    return (
 
-<div>
+        <form onSubmit={handleSubmit}>
 
-<form onSubmit={handleSubmit}>
+            <div className="row">
 
-<div className="row">
+                <div className="col-md-6 mb-3">
 
-<div className="col-md-6 mb-3">
+                    <label className="form-label">
+                        Title
+                    </label>
 
-<label className="form-label">Title</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Enter Task Title"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        required
+                    />
 
-<input
-type="text"
-className="form-control"
-placeholder="Enter Task Title"
-value={title}
-onChange={(e)=>setTitle(e.target.value)}
-required
-/>
+                </div>
 
-</div>
+                <div className="col-md-6 mb-3">
 
-<div className="col-md-6 mb-3">
+                    <label className="form-label">
+                        Due Date
+                    </label>
 
-<label className="form-label">Due Date</label>
+                    <input
+                        type="date"
+                        className="form-control"
+                        value={duedate}
+                        onChange={(e) => setDuedate(e.target.value)}
+                        required
+                    />
 
-<input
-type="date"
-className="form-control"
-value={duedate}
-onChange={(e)=>setDuedate(e.target.value)}
-required
-/>
+                </div>
 
-</div>
+            </div>
 
-</div>
+            <div className="mb-3">
 
-<div className="mb-3">
+                <label className="form-label">
+                    Description
+                </label>
 
-<label className="form-label">Description</label>
+                <textarea
+                    className="form-control"
+                    rows="3"
+                    placeholder="Task Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                />
 
-<textarea
-className="form-control"
-rows="3"
-placeholder="Task Description"
-value={description}
-onChange={(e)=>setDescription(e.target.value)}
-/>
+            </div>
 
-</div>
+            <div className="row">
 
-<div className="row">
+                <div className="col-md-6 mb-3">
 
-<div className="col-md-6 mb-3">
+                    <label className="form-label">
+                        Priority
+                    </label>
 
-<label className="form-label">Priority</label>
+                    <select
+                        className="form-select"
+                        value={priority}
+                        onChange={(e) => setPriority(e.target.value)}
+                    >
 
-<select
-className="form-select"
-value={priority}
-onChange={(e)=>setPriority(e.target.value)}
->
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
 
-<option value="low">Low</option>
-<option value="medium">Medium</option>
-<option value="high">High</option>
+                    </select>
 
-</select>
+                </div>
 
-</div>
+                <div className="col-md-6 mb-3">
 
-<div className="col-md-6 mb-3">
+                    <label className="form-label">
+                        Status
+                    </label>
 
-<label className="form-label">Status</label>
+                    <select
+                        className="form-select"
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                    >
 
-<select
-className="form-select"
-value={status}
-onChange={(e)=>setStatus(e.target.value)}
->
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
 
-<option value="pending">Pending</option>
-<option value="in_progress">In Progress</option>
-<option value="completed">Completed</option>
+                    </select>
 
-</select>
+                </div>
 
-</div>
+            </div>
 
-</div>
+            <button
+                type="submit"
+                className={`btn ${editingTask ? "btn-success" : "btn-primary"}`}
+            >
 
-<button
-type="submit"
-className="btn btn-primary"
->
+                <i className={`bi ${editingTask ? "bi-pencil-square" : "bi-plus-circle"} me-2`}></i>
 
-<i className="bi bi-plus-circle me-2"></i>
+                {editingTask ? "Update Task" : "Add Task"}
 
-Add Task
+            </button>
 
-</button>
+            {
 
-</form>
+                editingTask && (
 
-</div>
+                    <button
+                        type="button"
+                        className="btn btn-secondary ms-2"
+                        onClick={resetForm}
+                    >
 
-);
+                        Cancel
+
+                    </button>
+
+                )
+
+            }
+
+        </form>
+
+    );
 
 }
 

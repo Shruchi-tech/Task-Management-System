@@ -27,8 +27,10 @@ export const loginUser = (userData) => {
 
 // ---------- TASK ----------
 
-export const getTasks = () => {
-    return API.get("/tasks");
+export const getTasks = (params = {}) => {
+    return API.get("/tasks", {
+        params,
+    });
 };
 
 export const createTask = (taskData) => {
