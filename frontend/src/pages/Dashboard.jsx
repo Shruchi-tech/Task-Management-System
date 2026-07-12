@@ -26,7 +26,7 @@ const [statusFilter, setStatusFilter] = useState("");
 const [priorityFilter, setPriorityFilter] = useState("");
 
 const [sortOrder, setSortOrder] = useState("ASC"); 
-
+    const [page, setPage] = useState(1);
     const [editingTask, setEditingTask] = useState(null);
 
     const [stats, setStats] = useState({
@@ -45,6 +45,7 @@ const [sortOrder, setSortOrder] = useState("ASC");
          status: statusFilter,
          priority: priorityFilter,
          sort: sortOrder,
+         page,
          });
 
          setTasks(res.data);
@@ -110,14 +111,16 @@ const fetchOverdueTasks = async () => {
       fetchTodayTasks();
       fetchOverdueTasks();
 
-     }, [search, statusFilter, priorityFilter, sortOrder]);
+     }, [search, statusFilter, priorityFilter, sortOrder,page]);
 
       useEffect(() => {
 
         fetchStats();
 
      }, []);
-
+      useEffect(() => {
+         setPage(1);
+     }, [search, statusFilter, priorityFilter, sortOrder]);
     const handleDelete = async (id) => {
 
         try {
@@ -351,9 +354,11 @@ const fetchOverdueTasks = async () => {
                             editingTask={editingTask}
                             setEditingTask={setEditingTask}
                             fetchTasks={() => {
-                                fetchTasks();
-                                fetchStats();
-                            }}
+                             fetchTasks();
+                             fetchStats();
+                             fetchTodayTasks();
+                             fetchOverdueTasks();
+                           }}
                         />
 
                     </div>
@@ -464,6 +469,29 @@ const fetchOverdueTasks = async () => {
                         ))
 
                 }
+                <div className="d-flex justify-content-center align-items-center gap-3 mt-4">
+
+                  <button
+                      className="btn btn-outline-primary"
+                      disabled={page === 1}
+                      onClick={() => setPage(page - 1)}
+                    >
+                      ← Previous
+                  </button>
+
+                  <span className="fw-bold">
+                      Page {page}
+                  </span>
+
+                   <button
+                     className="btn btn-outline-primary"
+                     disabled={tasks.length < 5}
+                      onClick={() => setPage(page + 1)}
+                     >
+                      Next →
+                  </button>
+
+              </div>
 
             </div>
 
